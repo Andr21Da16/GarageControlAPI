@@ -31,11 +31,18 @@ public class VehicleTypeController {
     private final VehicleTypeService vehicleTypeService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<VehicleTypeResponseDTO>>> findAll(
-            @PageableDefault(size = 10, sort = "idType") Pageable pageable
-    ){
-        return ResponseEntity.ok(vehicleTypeService.findAll(pageable));
+    public ApiResponse<List<VehicleTypeResponseDTO>> findAll(
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Integer price,
+            @RequestParam(required = false) String name,
+            Pageable pageable
+    ) {
+        return vehicleTypeService.findAllWithFilters(
+                minPrice, maxPrice, price, name, pageable
+        );
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<VehicleTypeResponseDTO>> findById(
@@ -44,20 +51,6 @@ public class VehicleTypeController {
         return ResponseEntity.ok(vehicleTypeService.findById(id));
     }
 
-    @GetMapping("/by-name")
-    public ResponseEntity<ApiResponse<VehicleTypeResponseDTO>> findByName(
-            @RequestParam @NotBlank String name
-    ) {
-        return ResponseEntity.ok(vehicleTypeService.findByName(name));
-    }
-
-    @GetMapping("/by-price")
-    public ResponseEntity<ApiResponse<List<VehicleTypeResponseDTO>>> findByPrice(
-            @RequestParam @NotNull @Positive Integer price,
-            @PageableDefault(size = 10, sort = "idType") Pageable pageable
-    ) {
-        return ResponseEntity.ok(vehicleTypeService.findByPrice(price, pageable));
-    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<VehicleTypeResponseDTO>> addType(
@@ -73,6 +66,8 @@ public class VehicleTypeController {
         ApiResponse<VehicleTypeResponseDTO> response = vehicleTypeService.updateType(id, type);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteType(@PathVariable @Min(1) Long id) {

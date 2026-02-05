@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.andree.shopmanagerapi.domain.entities.VehicleType;
@@ -29,9 +30,22 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
 
     @Override
     @Transactional(readOnly = true)
-    public ApiResponse<List<VehicleTypeResponseDTO>> findAll(Pageable pageable) {
+    public ApiResponse<List<VehicleTypeResponseDTO>> findAllWithFilters(
+            Integer minPrice,
+            Integer maxPrice,
+            Integer price,
+            String name,
+            Pageable pageable
+    ) {
 
-        Page<VehicleType> page = vehicleTypeRepository.findAll(pageable);
+        Specification<VehicleType> spec = Specification
+                .where(priceBetween(minPrice, maxPrice))
+                .and(nameLike(name))
+                .and(hasExactPrice(price))
+                ;
+
+        Page<VehicleType> page =
+                vehicleTypeRepository.findAll(spec, pageable);
 
         Page<VehicleTypeResponseDTO> dtoPage =
                 page.map(vehicleTypeMapper::toDTO);
@@ -63,45 +77,8 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
                 .build();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public ApiResponse<VehicleTypeResponseDTO> findByName(String name) {
 
-        VehicleType vehicleType = vehicleTypeRepository
-                .findByNameTypeIgnoreCase(name)
-                .orElseThrow(() ->
-                        new VehicleTypeNotFoundException(
-                                "Vehicle type not found with name: " + name
-                        )
-                );
 
-        return ApiResponse.<VehicleTypeResponseDTO>builder()
-                .success(true)
-                .message("Vehicle type retrieved successfully")
-                .data(vehicleTypeMapper.toDTO(vehicleType))
-                .meta(null)
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ApiResponse<List<VehicleTypeResponseDTO>> findByPrice(
-            Integer price, Pageable pageable
-    ) {
-
-        Page<VehicleType> page =
-                vehicleTypeRepository.findVehicleTypeByPrice(price, pageable);
-
-        Page<VehicleTypeResponseDTO> dtoPage =
-                page.map(vehicleTypeMapper::toDTO);
-
-        return ApiResponse.<List<VehicleTypeResponseDTO>>builder()
-                .success(true)
-                .message("Vehicle types retrieved successfully")
-                .data(dtoPage.getContent())
-                .meta(metaMapper.fromPage(dtoPage))
-                .build();
-    }
 
     @Override
     @Transactional
@@ -160,6 +137,7 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
                 .build();
     }
 
+
     @Override
     @Transactional
     public ApiResponse<Void> deleteType(Long id) {
@@ -179,5 +157,31 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
                 .data(null)
                 .meta(null)
                 .build();
+    }
+
+    public static Specification<VehicleType> priceBetween(
+            Integer min, Integer max
+    ) {
+        return (root, query, cb) -> {
+            if (min == null && max == null) return null;
+            if (min == null) return cb.lessThanOrEqualTo(root.get("price"), max);
+            if (max == null) return cb.greaterThanOrEqualTo(root.get("price"), min);
+            return cb.between(root.get("price"), min, max);
+        };
+    }
+
+    public static Specification<VehicleType> nameLike(String name) {
+        return (root, query, cb) -> {
+            if (name == null || name.isBlank()) return null;
+            return cb.like(
+                    cb.lower(root.get("nameType")),
+                    "%" + name.toLowerCase() + "%"
+            );
+        };
+    }
+
+    public static Specification<VehicleType> hasExactPrice(Integer price) {
+        return (root, query, cb) ->
+                price == null ? null : cb.equal(root.get("price"), price);
     }
 }

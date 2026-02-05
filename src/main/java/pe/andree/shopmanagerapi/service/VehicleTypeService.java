@@ -11,11 +11,16 @@ import java.util.List;
 
 public interface VehicleTypeService {
 
-    ApiResponse<List<VehicleTypeResponseDTO>>  findAll(Pageable pageable);
+    ApiResponse<List<VehicleTypeResponseDTO>>  findAllWithFilters(
+            Integer minPrice,
+            Integer maxPrice,
+            Integer price,
+            String name,
+            Pageable pageable
+    );
     ApiResponse<VehicleTypeResponseDTO> findById(Long id);
-    ApiResponse<VehicleTypeResponseDTO> findByName(String name);
-    ApiResponse<List<VehicleTypeResponseDTO>>  findByPrice(Integer price, Pageable pageable);
     ApiResponse<VehicleTypeResponseDTO> addType(VehicleTypeRequestDTO vehicle);
     ApiResponse<VehicleTypeResponseDTO> updateType(Long id, VehicleTypeRequestDTO vehicle);
+
     ApiResponse<Void> deleteType(Long id);
 }
