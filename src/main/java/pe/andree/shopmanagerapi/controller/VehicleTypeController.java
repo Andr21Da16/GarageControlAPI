@@ -2,19 +2,13 @@ package pe.andree.shopmanagerapi.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pe.andree.shopmanagerapi.dto.ApiResponse;
-import pe.andree.shopmanagerapi.dto.request.VehicleTypeRequestDTO;
+import pe.andree.shopmanagerapi.dto.request.type.VehicleTypeRequestDTO;
 import pe.andree.shopmanagerapi.dto.response.VehicleTypeResponseDTO;
 import pe.andree.shopmanagerapi.service.VehicleTypeService;
 

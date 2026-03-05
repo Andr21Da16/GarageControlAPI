@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import pe.andree.shopmanagerapi.exceptions.company.CompanyNotFoundException;
+import pe.andree.shopmanagerapi.exceptions.drivers.DriverNotFoundException;
+import pe.andree.shopmanagerapi.exceptions.global.DuplicateException;
+import pe.andree.shopmanagerapi.exceptions.type.VehicleTypeNotFoundException;
+import pe.andree.shopmanagerapi.exceptions.vehicle.VehicleNotFoundException;
 
 import java.time.LocalDateTime;
 
@@ -36,9 +41,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DuplicateVehicleTypeException.class)
+    @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<ErrorDetails> handleDuplicateVehicleTypeException(
-            DuplicateVehicleTypeException ex,
+            DuplicateException ex,
             WebRequest request
     ) {
         ErrorDetails errorDetails = new ErrorDetails(

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import pe.andree.shopmanagerapi.domain.entities.VehicleType;
-import pe.andree.shopmanagerapi.dto.request.VehicleTypeRequestDTO;
+import pe.andree.shopmanagerapi.dto.request.type.VehicleTypeRequestDTO;
 import pe.andree.shopmanagerapi.dto.response.VehicleTypeResponseDTO;
 
 import java.util.List;

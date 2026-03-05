@@ -1,6 +1,4 @@
-package pe.andree.shopmanagerapi.dto.request;
-
-import jakarta.annotation.Nonnull;
+package pe.andree.shopmanagerapi.dto.request.type;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

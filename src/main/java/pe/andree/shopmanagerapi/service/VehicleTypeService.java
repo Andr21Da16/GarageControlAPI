@@ -1,8 +1,7 @@
 package pe.andree.shopmanagerapi.service;
 
-import org.springframework.data.domain.Page;
 import pe.andree.shopmanagerapi.dto.ApiResponse;
-import pe.andree.shopmanagerapi.dto.request.VehicleTypeRequestDTO;
+import pe.andree.shopmanagerapi.dto.request.type.VehicleTypeRequestDTO;
 import pe.andree.shopmanagerapi.dto.response.VehicleTypeResponseDTO;
 
 import org.springframework.data.domain.Pageable;

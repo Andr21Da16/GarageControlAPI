@@ -9,14 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.andree.shopmanagerapi.domain.entities.VehicleType;
 import pe.andree.shopmanagerapi.dto.ApiResponse;
-import pe.andree.shopmanagerapi.dto.request.VehicleTypeRequestDTO;
+import pe.andree.shopmanagerapi.dto.request.type.VehicleTypeRequestDTO;
 import pe.andree.shopmanagerapi.dto.response.VehicleTypeResponseDTO;
-import pe.andree.shopmanagerapi.exceptions.DuplicateVehicleTypeException;
-import pe.andree.shopmanagerapi.exceptions.VehicleTypeNotFoundException;
+import pe.andree.shopmanagerapi.exceptions.global.DuplicateException;
+
+import pe.andree.shopmanagerapi.exceptions.type.VehicleTypeNotFoundException;
 import pe.andree.shopmanagerapi.mapper.MetaMapper;
 import pe.andree.shopmanagerapi.mapper.VehicleTypeMapper;
 import pe.andree.shopmanagerapi.repository.VehicleTypeRepository;
 import pe.andree.shopmanagerapi.service.VehicleTypeService;
+import pe.andree.shopmanagerapi.utils.SpecificationUtil;
 
 import java.util.List;
 
@@ -39,10 +41,10 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
     ) {
 
         Specification<VehicleType> spec = Specification
-                .where(priceBetween(minPrice, maxPrice))
-                .and(nameLike(name))
-                .and(hasExactPrice(price))
-                ;
+                .where(SpecificationUtil.<VehicleType>priceBetween("price", minPrice, maxPrice))
+                .and(SpecificationUtil.<VehicleType>stringLike("nameType", name))
+                .and(SpecificationUtil.<VehicleType>hasExactPrice("price", price));
+
 
         Page<VehicleType> page =
                 vehicleTypeRepository.findAll(spec, pageable);
@@ -92,7 +94,7 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
         try {
             vehicleType = vehicleTypeRepository.save(vehicleType);
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateVehicleTypeException(
+            throw new DuplicateException(
                     "Vehicle type already exists"
             );
         }
@@ -124,7 +126,7 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
         try {
             existing = vehicleTypeRepository.save(existing);
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateVehicleTypeException(
+            throw new DuplicateException(
                     "Vehicle type already exists"
             );
         }
@@ -159,29 +161,4 @@ public class VehicleTypeServiceImpl implements VehicleTypeService {
                 .build();
     }
 
-    public static Specification<VehicleType> priceBetween(
-            Integer min, Integer max
-    ) {
-        return (root, query, cb) -> {
-            if (min == null && max == null) return null;
-            if (min == null) return cb.lessThanOrEqualTo(root.get("price"), max);
-            if (max == null) return cb.greaterThanOrEqualTo(root.get("price"), min);
-            return cb.between(root.get("price"), min, max);
-        };
-    }
-
-    public static Specification<VehicleType> nameLike(String name) {
-        return (root, query, cb) -> {
-            if (name == null || name.isBlank()) return null;
-            return cb.like(
-                    cb.lower(root.get("nameType")),
-                    "%" + name.toLowerCase() + "%"
-            );
-        };
-    }
-
-    public static Specification<VehicleType> hasExactPrice(Integer price) {
-        return (root, query, cb) ->
-                price == null ? null : cb.equal(root.get("price"), price);
-    }
 }

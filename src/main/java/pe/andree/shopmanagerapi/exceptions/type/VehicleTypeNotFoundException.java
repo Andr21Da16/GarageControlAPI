@@ -1,4 +1,4 @@
-package pe.andree.shopmanagerapi.exceptions;
+package pe.andree.shopmanagerapi.exceptions.type;
 
 public class VehicleTypeNotFoundException extends RuntimeException {
     public VehicleTypeNotFoundException(String message) {
